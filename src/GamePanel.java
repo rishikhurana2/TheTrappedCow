@@ -1,6 +1,7 @@
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -24,11 +25,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	int offset = 10;
 	int blocksY = 240;
 	ArrayList <Blocks> blocks = new ArrayList<Blocks>();
-	static boolean moveLeft = false;
-	static boolean moveRight = false;
 	static boolean jumpUp = false;
 	long enemyTimer = 0;
-	int spawnTimer = 1000;
+	int spawnTimer = 1250;
+	int score = 0;
 	GamePanel() {
 		cow = new Cow(50,250,50,50);
 		timer = new Timer(1000/60, this);
@@ -58,13 +58,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		g.setColor(Color.BLACK);
 		g.fillRect(-10, 330, 850, 200);
 		g.setFont(tellFont);
-		g.drawString("Score: ", 680, 25);
+		g.drawString("Score: " + score, 650, 25);
 		g.setFont(smallFont);
 		g.drawString("Press 'P' to go to the end screen", 620, 60);
 		cow.draw(g);
 		for (Blocks b: blocks) {
-			int getRandomBlocksY = new Random().nextInt(200) + 50;
-			b.draw(g, getRandomBlocksY);
+			b.draw(g);
 		}
 	}
 	public void drawEndStage(Graphics e) {
@@ -80,8 +79,26 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	public void updateGameStage() {
 		cow.update();
 		cow.restrict();
+        if(System.currentTimeMillis() - enemyTimer >= spawnTimer){
+    		addBlocksToBlockArray(new Blocks(new Random().nextInt(200) + 50));
+    		enemyTimer = System.currentTimeMillis();
+        }
 		for (Blocks b: blocks) {
 			b.update();
+		}
+		for (Blocks b: blocks) {
+			if (b.blocksBox.intersects(cow.collisionBox)) {
+				cow.alive = false;
+			}
+		}
+		if (cow.alive) {
+			score++;
+		}
+		if (!cow.alive) {
+			currentState = END_STAGE;
+			cow = new Cow(50,250,50,50);
+			blocks.clear();
+			score = 0;
 		}
 	}
 	public void updateEndStage() {
@@ -89,6 +106,13 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	}
 	void addBlocksToBlockArray(Blocks b) {
 		blocks.add(b);
+	}
+	void destroyObjects() {
+		for (int i = 0; i < blocks.size(); i++) {
+			if (blocks.get(i).x < -60) {
+				blocks.remove(i);
+			}
+		}
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -99,10 +123,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		}
 		if(currentState == GAME_STAGE) {
 			updateGameStage();
-	        if(System.currentTimeMillis() - enemyTimer >= spawnTimer){
-        		addBlocksToBlockArray(new Blocks());
-        		enemyTimer = System.currentTimeMillis();
-	        }
+			destroyObjects();
 		}
 		if(currentState == END_STAGE) {
 			updateEndStage();
@@ -139,12 +160,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 				currentState = MENU_STAGE;
 			}
 		}
-		if(e.getKeyCode() == KeyEvent.VK_LEFT) {
-			moveLeft = true;
-		}
-		if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-			moveRight = true;
-		}
 		if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 			jumpUp = true;
 		}
@@ -152,8 +167,5 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	@Override
 	public void keyReleased(KeyEvent e) {
 		// TODO Auto-generated method stub
-		moveRight = false;
-		moveLeft = false;
-		jumpUp = false;
 	}
 }
