@@ -10,7 +10,7 @@ public class TrappedCow {
 	public static void main(String[] args) {
 		TrappedCow TC = new TrappedCow();
 		TC.setup();
-	}
+		}
 	public void setup() {
 		gameFrame.add(gamePanel);
 		gameFrame.setPreferredSize(new Dimension(width, height));
