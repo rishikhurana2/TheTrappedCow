@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 
@@ -7,26 +8,28 @@ public class Cow {
 	double gravity = 1.5;
 	int speed = 5;
 	int jumpSpeed = 10;
-	static int x;
-	static int y;
+	int x;
+	int y;
 	int width;
 	int height;
 	int jumpRestriction = 110;
-	int screenWidth = TrappedCow.width - 60;
-	Rectangle collisionBox;
+	Rectangle TopCollisionBox;
+	Rectangle BottomBox;
 	boolean isFalling = false;
 	boolean alive = true;
 	Cow(int x, int y, int width, int height) {
-		Cow.x = x;
-		Cow.y =  y;
+		this.x = x;
+		this.y =  y;
 		this.width = width;
 		this.height = height;
-		collisionBox = new Rectangle(x,y,width,height - 10);
+		TopCollisionBox = new Rectangle(x,y,width,height - 7);
+		BottomBox = new Rectangle( (int) (x), y + 50, width, height - 43);
 	}
 	void draw(Graphics i) {
 		i.setColor(Color.WHITE);
 		i.fillRect(x, y, width, height);
-		collisionBox.setBounds(x,y,width,height - 10);
+		TopCollisionBox.setBounds(x,y,width,height - 7);
+		BottomBox.setBounds((int) (x), y + 50, width, height - 43);
 	}
 	void update() {
 		if(GamePanel.jumpUp == true) {

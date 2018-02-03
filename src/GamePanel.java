@@ -61,10 +61,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		g.drawString("Score: " + score, 650, 25);
 		g.setFont(smallFont);
 		g.drawString("Press 'P' to go to the end screen", 620, 60);
+		g.drawString("If you Jump on blocks, your score will drastically increase", 10, 20);
 		cow.draw(g);
 		for (Blocks b: blocks) {
 			b.draw(g);
 		}
+		
 	}
 	public void drawEndStage(Graphics e) {
 		e.setColor(Color.magenta);
@@ -80,15 +82,19 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		cow.update();
 		cow.restrict();
         if(System.currentTimeMillis() - enemyTimer >= spawnTimer){
-    		addBlocksToBlockArray(new Blocks(new Random().nextInt(200) + 50));
+    		addBlocksToBlockArray(new Blocks(new Random().nextInt(135) + 100));
     		enemyTimer = System.currentTimeMillis();
         }
 		for (Blocks b: blocks) {
 			b.update();
 		}
 		for (Blocks b: blocks) {
-			if (b.blocksBox.intersects(cow.collisionBox)) {
+			if (b.blocksBox.intersects(cow.TopCollisionBox)) {
 				cow.alive = false;
+			}
+			if (cow.BottomBox.intersects(b.blocksBox)) {
+				cow.y = b.y - 46;
+				score = score + 35;
 			}
 		}
 		if (cow.alive) {

@@ -7,6 +7,7 @@ public class PowerUps {
 	int width;
 	int height;
 	Rectangle powerUpsCollision;
+	Cow cow;
 	PowerUps(int x, int y, int width, int height) {
 		this.x = x;
 		this.y = y;
@@ -15,7 +16,6 @@ public class PowerUps {
 		powerUpsCollision = new Rectangle(x,y,width,height);
 	}
 	void draw(Graphics i) {
-		i.fillRect(Cow.x, arg1, arg2, arg3);
 	}
 	void update() {
 		

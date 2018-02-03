@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 
@@ -16,9 +17,12 @@ public class Blocks {
 		blocksBox = new Rectangle(x,y,width,height);
 	}
 	void draw(Graphics i) {
-		blocksBox.setBounds(x, y, width, height);
 		i.setColor(Color.YELLOW);
 		i.fillRect(x, y, width, height);
+		Graphics2D g2d = (Graphics2D) i;
+		blocksBox.setBounds(x, y, width, height);
+		g2d.setColor(Color.RED);
+		g2d.draw(blocksBox);
 	}
 	void update() {
 		x = x - blockSpeed;
