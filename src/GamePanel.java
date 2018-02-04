@@ -23,6 +23,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	final int MENU_STAGE = 0;
 	final int GAME_STAGE = 1;
 	final int END_STAGE = 2;
+	final int INSTRUCTION_STAGE = 3;
 	int currentState = MENU_STAGE;
 	int offset = 10;
 	int blocksY = 240;
@@ -37,7 +38,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		timer = new Timer(1000/60, this);
 		titleFont = new Font("Arial", Font.PLAIN, 48);
 		tellFont = new Font("Times New Roman", Font.PLAIN, 24);
-		smallFont = new Font("Times New Roman", Font.PLAIN, 12);
+		smallFont = new Font("Times New Roman", Font.PLAIN, 14);
 	}
 	public void startGame() {
 		timer.start();
@@ -64,10 +65,13 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		g.drawString("Score: " + score, 650, 25);
 		g.setFont(smallFont);
 		g.drawString("Press 'P' to go to the end screen", 620, 60);
-		g.drawString("If you Jump on blocks, your score will drastically increase", 10, 20);
 		cow.draw(g);
 		for (ScoreUps s: su) {
-			s.draw(g);
+			for (Blocks b: blocks) {
+				if (!s.powerUpsCollision.intersects(b.blocksBox)) {
+					s.draw(g);
+				}
+			}
 		}
 		for (Blocks b: blocks) {
 			b.draw(g);
@@ -79,6 +83,24 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		e.setFont(titleFont);
 		e.setColor(Color.BLACK);
 		e.drawString("Game Over", 275, 100);
+	}
+	public void drawInstructionStage(Graphics i) {
+		i.setColor(Color.black);
+		i.fillRect(0, 0, TrappedCow.width, TrappedCow.height);
+		i.setFont(titleFont);
+		i.setColor(Color.white);
+		i.drawString("Instructions", TrappedCow.width/2 - 125, 50);
+		i.setFont(tellFont);
+		i.drawString("Controls", 25, 75);
+		i.drawLine(25, 80, 110, 80);
+		i.drawString("Space = Jump" , 25, 125);
+		i.drawString("Description of Items", 25, 175);
+		i.drawLine(25, 180, 220, 180);
+		i.setFont(smallFont);
+		i.drawString("This game is a scroller, and there is blocks coming in from the right. What you need to do is AVOID THOSE BLOCKS", 25, 200);
+		i.drawString("Along the way, you will see red squares, and if you get those squares, your score will increase.", 25, 215);
+		i.drawString("Your score is displayed on the top right. As you navigate through the cow's infinite run, there will be enemies that will", 25, 230);
+		i.drawString("spawn from the sky, and YOU MUST DODGE THEM.", 25,  245);
 	}
 	public void updateMenuStage() {
 		
@@ -173,6 +195,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		if (currentState == END_STAGE) {
 			drawEndStage(i);
 		}
+		if (currentState == INSTRUCTION_STAGE) {
+			drawInstructionStage(i);
+		}
 	}
 	@Override
 	public void keyTyped(KeyEvent e) {
@@ -185,13 +210,17 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		if(e.getKeyCode() == KeyEvent.VK_P) {
 			if(currentState == MENU_STAGE) {
 				currentState = GAME_STAGE;
-			}
-			else if(currentState == GAME_STAGE) {
+			} else if (currentState == GAME_STAGE) {
 				currentState = END_STAGE;
-			}
-			else if(currentState == END_STAGE) {
+			} else if (currentState == END_STAGE) {
 				currentState = MENU_STAGE;
 			}
+		}
+		if (e.getKeyCode() == KeyEvent.VK_I && currentState == MENU_STAGE) {
+			currentState = INSTRUCTION_STAGE;
+		}
+		if (e.getKeyCode() == KeyEvent.VK_ESCAPE && currentState == INSTRUCTION_STAGE) {
+			currentState = MENU_STAGE;
 		}
 		if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 			jumpUp = true;
