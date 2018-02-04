@@ -18,16 +18,19 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	Font tellFont;
 	Font smallFont;
 	Cow cow; 
+	ArrayList <Blocks> blocks = new ArrayList<Blocks>();
+	ArrayList <ScoreUps> su = new ArrayList<ScoreUps>();
 	final int MENU_STAGE = 0;
 	final int GAME_STAGE = 1;
 	final int END_STAGE = 2;
 	int currentState = MENU_STAGE;
 	int offset = 10;
 	int blocksY = 240;
-	ArrayList <Blocks> blocks = new ArrayList<Blocks>();
 	static boolean jumpUp = false;
 	long enemyTimer = 0;
 	int spawnTimer = 1250;
+	long scoreUpTimer = 0;
+	int scoreUpSpawnTimer = 10000;
 	int score = 0;
 	GamePanel() {
 		cow = new Cow(50,250,50,50);
@@ -63,10 +66,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		g.drawString("Press 'P' to go to the end screen", 620, 60);
 		g.drawString("If you Jump on blocks, your score will drastically increase", 10, 20);
 		cow.draw(g);
+		for (ScoreUps s: su) {
+			s.draw(g);
+		}
 		for (Blocks b: blocks) {
 			b.draw(g);
 		}
-		
 	}
 	public void drawEndStage(Graphics e) {
 		e.setColor(Color.magenta);
@@ -81,12 +86,19 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	public void updateGameStage() {
 		cow.update();
 		cow.restrict();
-        if(System.currentTimeMillis() - enemyTimer >= spawnTimer){
+        if (System.currentTimeMillis() - enemyTimer >= spawnTimer) {
     		addBlocksToBlockArray(new Blocks(new Random().nextInt(135) + 100));
     		enemyTimer = System.currentTimeMillis();
         }
+        if (System.currentTimeMillis() - scoreUpTimer >= scoreUpSpawnTimer) {
+        		addScoreUpsToScoreUpsArray(new ScoreUps(810,new Random().nextInt(135) + 100, 10,10));
+        	scoreUpTimer = System.currentTimeMillis();
+        }
 		for (Blocks b: blocks) {
 			b.update();
+		}
+		for (ScoreUps p: su) {
+			p.update();
 		}
 		for (Blocks b: blocks) {
 			if (b.blocksBox.intersects(cow.TopCollisionBox)) {
@@ -104,19 +116,34 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 			currentState = END_STAGE;
 			cow = new Cow(50,250,50,50);
 			blocks.clear();
+			su.clear();
 			score = 0;
 		}
 	}
 	public void updateEndStage() {
-		
+		jumpUp = false;
+		cow = new Cow(50,250,50,50);
+		blocks.clear();
+		su.clear();
+		score = 0;
 	}
 	void addBlocksToBlockArray(Blocks b) {
 		blocks.add(b);
 	}
-	void destroyObjects() {
+	void addScoreUpsToScoreUpsArray(ScoreUps s) {
+		su.add(s);
+	}
+	void destroyUnusedObjects() {
 		for (int i = 0; i < blocks.size(); i++) {
 			if (blocks.get(i).x < -60) {
 				blocks.remove(i);
+			}
+		}
+		for (int i = 0; i < su.size(); i++) {
+			if (cow.TopCollisionBox.intersects(su.get(i).powerUpsCollision) 
+				|| cow.BottomBox.intersects(su.get(i).powerUpsCollision)) {
+				su.remove(i);
+				score = score + 100;
 			}
 		}
 	}
@@ -129,7 +156,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		}
 		if(currentState == GAME_STAGE) {
 			updateGameStage();
-			destroyObjects();
+			destroyUnusedObjects();
 		}
 		if(currentState == END_STAGE) {
 			updateEndStage();
@@ -173,5 +200,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	@Override
 	public void keyReleased(KeyEvent e) {
 		// TODO Auto-generated method stub
+		
 	}
 }

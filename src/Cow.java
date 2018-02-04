@@ -23,16 +23,21 @@ public class Cow {
 		this.width = width;
 		this.height = height;
 		TopCollisionBox = new Rectangle(x,y,width,height - 7);
-		BottomBox = new Rectangle( (int) (x), y + 50, width, height - 43);
+		BottomBox = new Rectangle((int)(x), y + 50, width, height - 43);
 	}
 	void draw(Graphics i) {
 		i.setColor(Color.WHITE);
 		i.fillRect(x, y, width, height);
 		TopCollisionBox.setBounds(x,y,width,height - 7);
 		BottomBox.setBounds((int) (x), y + 50, width, height - 43);
+//		Graphics2D g2d = (Graphics2D) i;
+//		g2d.setColor(Color.yellow);
+//		g2d.draw(BottomBox);
+//		g2d.setColor(Color.red);
+//		g2d.draw(TopCollisionBox);
 	}
 	void update() {
-		if(GamePanel.jumpUp == true) {
+		if(GamePanel.jumpUp) {
 			y = y - jumpSpeed;
 		}
 		if (isFalling) {
@@ -40,12 +45,6 @@ public class Cow {
 		}
 	}
 	void restrict() {
-		if (x > TrappedCow.width - 60) {
-			x = TrappedCow.width - 60;
-		}
-		if (x < 0) {
-			x = 0;
-		}
 		if (y < jumpRestriction) {
 			isFalling = true;
 		}

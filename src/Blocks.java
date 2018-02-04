@@ -19,10 +19,7 @@ public class Blocks {
 	void draw(Graphics i) {
 		i.setColor(Color.YELLOW);
 		i.fillRect(x, y, width, height);
-		Graphics2D g2d = (Graphics2D) i;
 		blocksBox.setBounds(x, y, width, height);
-		g2d.setColor(Color.RED);
-		g2d.draw(blocksBox);
 	}
 	void update() {
 		x = x - blockSpeed;
