@@ -1,7 +1,6 @@
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -20,6 +19,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	Cow cow; 
 	ArrayList <Blocks> blocks = new ArrayList<Blocks>();
 	ArrayList <ScoreUps> su = new ArrayList<ScoreUps>();
+	ArrayList <Enemies> enemies = new ArrayList<Enemies>();
 	final int MENU_STAGE = 0;
 	final int GAME_STAGE = 1;
 	final int END_STAGE = 2;
@@ -28,10 +28,14 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	int offset = 10;
 	int blocksY = 240;
 	static boolean jumpUp = false;
-	long enemyTimer = 0;
-	int spawnTimer = 1250;
+	static boolean moveLeft = false;
+	static boolean moveRight = false;
+	long blocksTimer = 0;
+	int blockSpawnTimer = 1250;
 	long scoreUpTimer = 0;
 	int scoreUpSpawnTimer = 10000;
+	long enemyTimer = 0;
+	int enemySpawnTimer = 5000;
 	int score = 0;
 	GamePanel() {
 		cow = new Cow(50,250,50,50);
@@ -58,9 +62,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		g.setColor(Color.BLUE);
 		g.fillRect(0, 0, TrappedCow.width, TrappedCow.height);
 		g.setColor(Color.GREEN);
-		g.fillRect(-10, 300, 850, 30);
+		g.fillRect(-10, 300, TrappedCow.width + 10, 30);
 		g.setColor(Color.BLACK);
-		g.fillRect(-10, 330, 850, 200);
+		g.fillRect(-10, 330, TrappedCow.width + 10, 175);
 		g.setFont(tellFont);
 		g.drawString("Score: " + score, 650, 25);
 		g.setFont(smallFont);
@@ -68,7 +72,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		cow.draw(g);
 		for (ScoreUps s: su) {
 			for (Blocks b: blocks) {
-				if (!s.powerUpsCollision.intersects(b.blocksBox)) {
+				if (!s.scoreUpsCollisionBox.intersects(b.blocksBox)) {
 					s.draw(g);
 				}
 			}
@@ -76,13 +80,19 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		for (Blocks b: blocks) {
 			b.draw(g);
 		}
+		for (Enemies e: enemies) {
+			e.draw(g);
+		}
 	}
 	public void drawEndStage(Graphics e) {
 		e.setColor(Color.magenta);
 		e.fillRect(0, 0, TrappedCow.width, TrappedCow.height);
 		e.setFont(titleFont);
 		e.setColor(Color.BLACK);
-		e.drawString("Game Over", 275, 100);
+		e.drawString("Game Over", 275, 50);
+		e.setFont(tellFont);
+		e.drawString("Your Score was " + score, 310, 200);
+		e.drawString("Press 'P' to go back to the menu", 250 , 350);
 	}
 	public void drawInstructionStage(Graphics i) {
 		i.setColor(Color.black);
@@ -101,20 +111,28 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		i.drawString("Along the way, you will see red squares, and if you get those squares, your score will increase.", 25, 215);
 		i.drawString("Your score is displayed on the top right. As you navigate through the cow's infinite run, there will be enemies that will", 25, 230);
 		i.drawString("spawn from the sky, and YOU MUST DODGE THEM.", 25,  245);
+		i.setFont(tellFont);
+		i.drawString("Press 'esc' to go back to the home screen", 25, 470);
 	}
 	public void updateMenuStage() {
-		
+		score = 0;
 	}
 	public void updateGameStage() {
 		cow.update();
 		cow.restrict();
-        if (System.currentTimeMillis() - enemyTimer >= spawnTimer) {
-    		addBlocksToBlockArray(new Blocks(new Random().nextInt(135) + 100));
-    		enemyTimer = System.currentTimeMillis();
+        if (System.currentTimeMillis() - blocksTimer >= blockSpawnTimer) {
+    			addBlocksToBlockArray(new Blocks(new Random().nextInt(135) + 100));
+    			blocksTimer = System.currentTimeMillis();
         }
         if (System.currentTimeMillis() - scoreUpTimer >= scoreUpSpawnTimer) {
-        		addScoreUpsToScoreUpsArray(new ScoreUps(810,new Random().nextInt(135) + 100, 10,10));
-        	scoreUpTimer = System.currentTimeMillis();
+        		addScoreUpsToScoreUpsArray(new ScoreUps(810, new Random().nextInt(135) + 100, 10, 10));
+        		scoreUpTimer = System.currentTimeMillis();
+        }
+        if (System.currentTimeMillis() - enemyTimer >= enemySpawnTimer) {
+        		if (score > 20000) {
+        			addEnemiesToEnemiesArray(new Enemies(new Random().nextInt(780) + 15, -10, 60,60));
+        		}
+        		enemyTimer = System.currentTimeMillis();
         }
 		for (Blocks b: blocks) {
 			b.update();
@@ -131,6 +149,16 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 				score = score + 35;
 			}
 		}
+		for (Enemies e : enemies) {
+			if (e.enemiesCollisionBox.intersects(cow.TopCollisionBox)||
+				e.enemiesCollisionBox.intersects(cow.BottomBox)) {
+				cow.alive = false;
+			}
+				
+		}
+		for (Enemies e: enemies) {
+			e.update();
+		}
 		if (cow.alive) {
 			score++;
 		}
@@ -139,7 +167,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 			cow = new Cow(50,250,50,50);
 			blocks.clear();
 			su.clear();
-			score = 0;
+			enemies.clear();
 		}
 	}
 	public void updateEndStage() {
@@ -147,13 +175,16 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		cow = new Cow(50,250,50,50);
 		blocks.clear();
 		su.clear();
-		score = 0;
+		enemies.clear();
 	}
 	void addBlocksToBlockArray(Blocks b) {
 		blocks.add(b);
 	}
 	void addScoreUpsToScoreUpsArray(ScoreUps s) {
 		su.add(s);
+	}
+	void addEnemiesToEnemiesArray(Enemies e) {
+		enemies.add(e);
 	}
 	void destroyUnusedObjects() {
 		for (int i = 0; i < blocks.size(); i++) {
@@ -162,10 +193,15 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 			}
 		}
 		for (int i = 0; i < su.size(); i++) {
-			if (cow.TopCollisionBox.intersects(su.get(i).powerUpsCollision) 
-				|| cow.BottomBox.intersects(su.get(i).powerUpsCollision)) {
+			if (cow.TopCollisionBox.intersects(su.get(i).scoreUpsCollisionBox) 
+				|| cow.BottomBox.intersects(su.get(i).scoreUpsCollisionBox)) {
 				su.remove(i);
-				score = score + 100;
+				score = score + 250;
+			}
+		}
+		for (int i = 0; i < enemies.size(); i++) {
+			if (enemies.get(i).y > 500) {
+				enemies.remove(i);
 			}
 		}
 	}
@@ -222,13 +258,20 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		if (e.getKeyCode() == KeyEvent.VK_ESCAPE && currentState == INSTRUCTION_STAGE) {
 			currentState = MENU_STAGE;
 		}
-		if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+		if (e.getKeyCode() == KeyEvent.VK_SPACE && currentState == GAME_STAGE) {
 			jumpUp = true;
+		}
+		if (e.getKeyCode() == KeyEvent.VK_LEFT && currentState == GAME_STAGE && score > 20000) {
+			moveLeft = true;
+		}
+		if (e.getKeyCode() == KeyEvent.VK_RIGHT && currentState == GAME_STAGE && score > 20000) {
+			moveRight = true;
 		}
 	}
 	@Override
 	public void keyReleased(KeyEvent e) {
 		// TODO Auto-generated method stub
-		
+		moveRight = false;
+		moveLeft = false;
 	}
 }

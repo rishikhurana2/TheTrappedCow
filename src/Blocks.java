@@ -5,7 +5,7 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 
 public class Blocks {
-	int x = 810;
+	int x = 820;
 	int y;
 	int width = 60;
 	int height = 60;

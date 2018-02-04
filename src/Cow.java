@@ -43,8 +43,20 @@ public class Cow {
 		if (isFalling) {
 			jumpSpeed -= gravity;
 		}
+		if (GamePanel.moveLeft) {
+			x = x - speed;
+		}
+		if (GamePanel.moveRight) {
+			x = x + speed;
+		}
 	}
 	void restrict() {
+		if (x < 0) {
+			x = 0;
+		}
+		if (x > TrappedCow.width - 50) {
+			x = TrappedCow.width - 50;
+		}
 		if (y < jumpRestriction) {
 			isFalling = true;
 		}
