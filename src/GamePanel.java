@@ -5,9 +5,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -37,12 +40,22 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	long enemyTimer = 0;
 	int enemySpawnTimer = 5000;
 	int score = 0;
+	int fps = 1000/120;
+	public static BufferedImage cowImg;
+	public static BufferedImage backgroundImg;
 	GamePanel() {
 		cow = new Cow(50,250,50,50);
-		timer = new Timer(1000/60, this);
+		timer = new Timer(fps, this);
 		titleFont = new Font("Arial", Font.PLAIN, 48);
 		tellFont = new Font("Times New Roman", Font.PLAIN, 24);
 		smallFont = new Font("Times New Roman", Font.PLAIN, 14);
+        try {
+            cowImg = ImageIO.read(this.getClass().getResourceAsStream("cow object.png"));
+            backgroundImg = ImageIO.read(this.getClass().getResourceAsStream("Background.png"));
+         } catch (IOException e) {
+            // TODO Auto-generated catch block
+        		e.printStackTrace();
+          }
 	}
 	public void startGame() {
 		timer.start();
@@ -59,8 +72,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		m.drawString("Press 'I' for Instructions", 275, 300);
 	}
 	public void drawGameStage(Graphics g) {
-		g.setColor(Color.BLUE);
-		g.fillRect(0, 0, TrappedCow.width, TrappedCow.height);
+		g.drawImage(backgroundImg, 0, 0, TrappedCow.width, TrappedCow.height, null);
 		g.setColor(Color.GREEN);
 		g.fillRect(-10, 300, TrappedCow.width + 10, 30);
 		g.setColor(Color.BLACK);
@@ -116,6 +128,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	}
 	public void updateMenuStage() {
 		score = 0;
+		enemies.clear();
 	}
 	public void updateGameStage() {
 		cow.update();
@@ -129,8 +142,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
         		scoreUpTimer = System.currentTimeMillis();
         }
         if (System.currentTimeMillis() - enemyTimer >= enemySpawnTimer) {
-        		if (score > 20000) {
-        			addEnemiesToEnemiesArray(new Enemies(new Random().nextInt(780) + 15, -10, 60,60));
+        		if (score > 5000) {
+        			addEnemiesToEnemiesArray(new Enemies(new Random().nextInt(TrappedCow.width) + 15, -10, 60,60));
         		}
         		enemyTimer = System.currentTimeMillis();
         }
@@ -196,11 +209,11 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 			if (cow.TopCollisionBox.intersects(su.get(i).scoreUpsCollisionBox) 
 				|| cow.BottomBox.intersects(su.get(i).scoreUpsCollisionBox)) {
 				su.remove(i);
-				score = score + 250;
+				score = score + 500;
 			}
 		}
 		for (int i = 0; i < enemies.size(); i++) {
-			if (enemies.get(i).y > 500) {
+			if (enemies.get(i).y > 400) {
 				enemies.remove(i);
 			}
 		}
@@ -261,10 +274,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		if (e.getKeyCode() == KeyEvent.VK_SPACE && currentState == GAME_STAGE) {
 			jumpUp = true;
 		}
-		if (e.getKeyCode() == KeyEvent.VK_LEFT && currentState == GAME_STAGE && score > 20000) {
+		if (e.getKeyCode() == KeyEvent.VK_LEFT && currentState == GAME_STAGE && score > 5000) {
 			moveLeft = true;
 		}
-		if (e.getKeyCode() == KeyEvent.VK_RIGHT && currentState == GAME_STAGE && score > 20000) {
+		if (e.getKeyCode() == KeyEvent.VK_RIGHT && currentState == GAME_STAGE && score > 5000) {
 			moveRight = true;
 		}
 	}

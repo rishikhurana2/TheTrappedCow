@@ -7,7 +7,7 @@ public class Enemies {
 	int y;
 	int width;
 	int height;
-	int speed = 5;
+	double speed = 3.5;
 	Rectangle enemiesCollisionBox;
 	Enemies(int x, int y, int width, int height) {
 		this.x = x;
@@ -22,6 +22,6 @@ public class Enemies {
 		enemiesCollisionBox.setBounds(x, y, width, height);
 	}
 	void update() {
-		y = y + speed;
+		y = y + (int) speed;
 	}
 }
