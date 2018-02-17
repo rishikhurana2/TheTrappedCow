@@ -18,7 +18,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	Timer timer;
 	Font titleFont;
 	Font tellFont;
-	Font smallFont;
+	Font smallFont1;
+	Font smallFont2;
 	Cow cow; 
 	ArrayList <Blocks> blocks = new ArrayList<Blocks>();
 	ArrayList <ScoreUps> su = new ArrayList<ScoreUps>();
@@ -36,22 +37,29 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	long blocksTimer = 0;
 	int blockSpawnTimer = 1250;
 	long scoreUpTimer = 0;
-	int scoreUpSpawnTimer = 10000;
+	int scoreUpSpawnTimer = 3000;
 	long enemyTimer = 0;
 	int enemySpawnTimer = 5000;
 	int score = 0;
 	int fps = 1000/60;
+<<<<<<< HEAD
+=======
+	String tellIfYouCanMove = "You can move now to dodge blocks!";
+>>>>>>> cae7e81477f41adf5a6ca3703dbb9507c7c6c79e
 	public static BufferedImage cowImg;
 	public static BufferedImage backgroundImg;
+	public static BufferedImage scoreUpImg;
 	GamePanel() {
 		cow = new Cow(50,250,50,50);
 		timer = new Timer(fps, this);
 		titleFont = new Font("Arial", Font.PLAIN, 48);
 		tellFont = new Font("Times New Roman", Font.PLAIN, 24);
-		smallFont = new Font("Times New Roman", Font.PLAIN, 14);
+		smallFont1 = new Font("Arial", Font.PLAIN, 14);
+		smallFont2 = new Font("Arial", Font.BOLD, 14);
         try {
             cowImg = ImageIO.read(this.getClass().getResourceAsStream("cow object.png"));
             backgroundImg = ImageIO.read(this.getClass().getResourceAsStream("Background.png"));
+            scoreUpImg = ImageIO.read(this.getClass().getResourceAsStream("scoreUp.png"));
          } catch (IOException e) {
             // TODO Auto-generated catch block
         		e.printStackTrace();
@@ -79,13 +87,14 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		g.fillRect(-10, 330, TrappedCow.width + 10, 175);
 		g.setFont(tellFont);
 		g.drawString("Score: " + score, 650, 25);
-		g.setFont(smallFont);
-		g.drawString("Press 'P' to go to the end screen", 620, 60);
+		g.setFont(smallFont1);
+		g.drawString("Press 'P' to go to the end screen", 580, 60);
 		cow.draw(g);
-		for (ScoreUps s: su) {
+		for (int i = 0; i < su.size(); i++) {
 			for (Blocks b: blocks) {
-				if (!s.scoreUpsCollisionBox.intersects(b.blocksBox)) {
-					s.draw(g);
+				su.get(i).draw(g);
+				if (su.get(i).scoreUpsCollisionBox.intersects(b.blocksBox)) {
+					su.remove(i);
 				}
 			}
 		}
@@ -94,6 +103,14 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		}
 		for (Enemies e: enemies) {
 			e.draw(g);
+		}
+		if (score > 5000) {
+			g.setFont(smallFont2);
+			g.setColor(Color.black);
+			g.drawString(tellIfYouCanMove, 20, 20);
+		}
+		if (score > 6500) {
+			tellIfYouCanMove = "";
 		}
 	}
 	public void drawEndStage(Graphics e) {
@@ -115,20 +132,24 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		i.setFont(tellFont);
 		i.drawString("Controls", 25, 75);
 		i.drawLine(25, 80, 110, 80);
-		i.drawString("Space = Jump" , 25, 125);
-		i.drawString("Description of Items", 25, 175);
-		i.drawLine(25, 180, 220, 180);
-		i.setFont(smallFont);
-		i.drawString("This game is a scroller, and there is blocks coming in from the right. What you need to do is AVOID THOSE BLOCKS", 25, 200);
-		i.drawString("Along the way, you will see red squares, and if you get those squares, your score will increase.", 25, 215);
-		i.drawString("Your score is displayed on the top right. As you navigate through the cow's infinite run, there will be enemies that will", 25, 230);
-		i.drawString("spawn from the sky, and YOU MUST DODGE THEM.", 25,  245);
+		i.drawString("Space = Jump" , 25, 100);
+		i.drawString("Left arrow = move left (once your score hits 5000)", 25, 125);
+		i.drawString("Right Arrow = move right (once your score hits 5000)", 25, 150);
+		i.drawString("Description of Items", 25, 200);
+		i.drawLine(25, 205, 220, 205);
+		i.setFont(smallFont1);
+		i.drawString("This game is a scroller, and there is blocks coming in from the right. What you need to do is AVOID THOSE BLOCKS.", 25, 225);
+		i.drawString("You can, however, jump on the blocks (which will increase your score). Along the way, you will see gold coins, and if you", 25, 240);
+		i.drawString("get those coins, your score will increase. Your score is displayed on the top right. As you navigate through the cow's", 25, 255);
+		i.drawString("infinite run, there will be enemies that will spawn from the sky, and YOU MUST DODGE THEM, or game over.", 25,  270);
+		i.drawString("Finally, you cannot jump will on the blocks", 25, 285);
 		i.setFont(tellFont);
 		i.drawString("Press 'esc' to go back to the home screen", 25, 470);
 	}
 	public void updateMenuStage() {
 		score = 0;
 		enemies.clear();
+		su.clear();
 	}
 	public void updateGameStage() {
 		cow.update();
@@ -143,7 +164,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
         }
         if (System.currentTimeMillis() - enemyTimer >= enemySpawnTimer) {
         		if (score > 5000) {
-        			addEnemiesToEnemiesArray(new Enemies(new Random().nextInt(TrappedCow.width) + 15, -10, 60,60));
+        			addEnemiesToEnemiesArray(new Enemies(new Random().nextInt(cow.x) + 150, -10, 60,60));
         		}
         		enemyTimer = System.currentTimeMillis();
         }
@@ -213,7 +234,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 			}
 		}
 		for (int i = 0; i < enemies.size(); i++) {
-			if (enemies.get(i).y > 400) {
+			if (enemies.get(i).y > TrappedCow.height) {
 				enemies.remove(i);
 			}
 		}

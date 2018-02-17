@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
 public class ScoreUps {
@@ -18,9 +19,11 @@ public class ScoreUps {
 		scoreUpsCollisionBox = new Rectangle(x,y,width,height);
 	}
 	void draw(Graphics i) {
-		i.setColor(Color.red);
-		i.fillRect(x, y, width, height);
-		scoreUpsCollisionBox.setBounds(x, y, width, height);
+		i.drawImage(GamePanel.scoreUpImg, x, y, width + 100, height + 100, null);
+		scoreUpsCollisionBox.setBounds(x + 16, y + 25, width + 25, height + 25);
+//		Graphics2D g2d = (Graphics2D) i;
+//		g2d.setColor(Color.red);
+//		g2d.draw(scoreUpsCollisionBox);
 	}
 	void update() {
 		x = x - powerUpsSpeed;

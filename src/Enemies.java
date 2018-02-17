@@ -17,7 +17,7 @@ public class Enemies {
 		enemiesCollisionBox = new Rectangle(x,y,width,height);
 	}
 	void draw(Graphics i) {
-		i.setColor(Color.black);
+		i.setColor(Color.yellow);
 		i.fillRect(x, y, width, height);
 		enemiesCollisionBox.setBounds(x, y, width, height);
 	}
