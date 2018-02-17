@@ -40,7 +40,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	long enemyTimer = 0;
 	int enemySpawnTimer = 5000;
 	int score = 0;
-	int fps = 1000/120;
+	int fps = 1000/60;
 	public static BufferedImage cowImg;
 	public static BufferedImage backgroundImg;
 	GamePanel() {
