@@ -42,10 +42,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	int enemySpawnTimer = 5000;
 	int score = 0;
 	int fps = 1000/60;
-<<<<<<< HEAD
-=======
+	int counterForSound = 0;
 	String tellIfYouCanMove = "You can move now to dodge blocks!";
->>>>>>> cae7e81477f41adf5a6ca3703dbb9507c7c6c79e
 	public static BufferedImage cowImg;
 	public static BufferedImage backgroundImg;
 	public static BufferedImage scoreUpImg;
@@ -148,12 +146,17 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	}
 	public void updateMenuStage() {
 		score = 0;
+		counterForSound = 0;
 		enemies.clear();
 		su.clear();
 	}
 	public void updateGameStage() {
 		cow.update();
 		cow.restrict();
+		if (counterForSound > 50) {
+			cow.playSound("cow.wav");
+			counterForSound = 0;
+		}
         if (System.currentTimeMillis() - blocksTimer >= blockSpawnTimer) {
     			addBlocksToBlockArray(new Blocks(new Random().nextInt(135) + 100));
     			blocksTimer = System.currentTimeMillis();
@@ -164,7 +167,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
         }
         if (System.currentTimeMillis() - enemyTimer >= enemySpawnTimer) {
         		if (score > 5000) {
-        			addEnemiesToEnemiesArray(new Enemies(new Random().nextInt(cow.x) + 150, -10, 60,60));
+        			addEnemiesToEnemiesArray(new Enemies(new Random().nextInt(cow.x + 100) + 150, -10, 60,60));
         		}
         		enemyTimer = System.currentTimeMillis();
         }
@@ -178,9 +181,11 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 			if (b.blocksBox.intersects(cow.TopCollisionBox)) {
 				cow.alive = false;
 			}
-			if (cow.BottomBox.intersects(b.blocksBox)) {
+			if (b.blocksBox.intersects(cow.BottomBox)) {
 				cow.y = b.y - 46;
 				score = score + 35;
+				cow.isFalling = false;
+				counterForSound++;
 			}
 		}
 		for (Enemies e : enemies) {
@@ -239,6 +244,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 			}
 		}
 	}
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
