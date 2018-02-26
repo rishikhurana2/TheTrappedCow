@@ -42,11 +42,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	int enemySpawnTimer = 5000;
 	int score = 0;
 	int fps = 1000/60;
-	int counterForSound = 0;
+	static int counterForSound = 0;
 	String tellIfYouCanMove = "You can move now to dodge blocks!";
 	public static BufferedImage cowImg;
 	public static BufferedImage backgroundImg;
 	public static BufferedImage scoreUpImg;
+	public static BufferedImage rocketEnemy;
 	GamePanel() {
 		cow = new Cow(50,250,50,50);
 		timer = new Timer(fps, this);
@@ -58,6 +59,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
             cowImg = ImageIO.read(this.getClass().getResourceAsStream("cow object.png"));
             backgroundImg = ImageIO.read(this.getClass().getResourceAsStream("Background.png"));
             scoreUpImg = ImageIO.read(this.getClass().getResourceAsStream("scoreUp.png"));
+            rocketEnemy = ImageIO.read(this.getClass().getResourceAsStream("rocketEnemy.png"));
          } catch (IOException e) {
             // TODO Auto-generated catch block
         		e.printStackTrace();
@@ -119,7 +121,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		e.drawString("Game Over", 275, 50);
 		e.setFont(tellFont);
 		e.drawString("Your Score was " + score, 310, 200);
-		e.drawString("Press 'P' to go back to the menu", 250 , 350);
+		e.drawString("Press 'esc' to go back to the menu", 250 , 350);
 	}
 	public void drawInstructionStage(Graphics i) {
 		i.setColor(Color.black);
@@ -140,7 +142,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		i.drawString("You can, however, jump on the blocks (which will increase your score). Along the way, you will see gold coins, and if you", 25, 240);
 		i.drawString("get those coins, your score will increase. Your score is displayed on the top right. As you navigate through the cow's", 25, 255);
 		i.drawString("infinite run, there will be enemies that will spawn from the sky, and YOU MUST DODGE THEM, or game over.", 25,  270);
-		i.drawString("Finally, you cannot jump will on the blocks", 25, 285);
+		i.drawString("Finally, you cannot jump while on the blocks", 25, 285);
 		i.setFont(tellFont);
 		i.drawString("Press 'esc' to go back to the home screen", 25, 470);
 	}
@@ -181,11 +183,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 			if (b.blocksBox.intersects(cow.TopCollisionBox)) {
 				cow.alive = false;
 			}
-			if (b.blocksBox.intersects(cow.BottomBox)) {
+			if (cow.BottomBox.intersects(b.blocksBox)) {
 				cow.y = b.y - 46;
-				score = score + 35;
+				score = score + 20;
 				cow.isFalling = false;
-				counterForSound++;
 			}
 		}
 		for (Enemies e : enemies) {
@@ -235,7 +236,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 			if (cow.TopCollisionBox.intersects(su.get(i).scoreUpsCollisionBox) 
 				|| cow.BottomBox.intersects(su.get(i).scoreUpsCollisionBox)) {
 				su.remove(i);
-				score = score + 500;
+				score = score + 800;
 			}
 		}
 		for (int i = 0; i < enemies.size(); i++) {
@@ -288,7 +289,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 				currentState = GAME_STAGE;
 			} else if (currentState == GAME_STAGE) {
 				currentState = END_STAGE;
-			} else if (currentState == END_STAGE) {
+			}
+		}
+		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+			if (currentState == END_STAGE) {
 				currentState = MENU_STAGE;
 			}
 		}

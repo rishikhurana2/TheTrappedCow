@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
 public class Enemies {
@@ -17,9 +18,11 @@ public class Enemies {
 		enemiesCollisionBox = new Rectangle(x,y,width,height);
 	}
 	void draw(Graphics i) {
-		i.setColor(Color.yellow);
-		i.fillRect(x, y, width, height);
-		enemiesCollisionBox.setBounds(x, y, width, height);
+		i.drawImage(GamePanel.rocketEnemy, x, y, width + 30, height + 30, null);
+		enemiesCollisionBox.setBounds(x + 20, y, width  - 25, height + 7);
+//		Graphics2D g2d = (Graphics2D) i;
+//		g2d.setColor(Color.red);
+//		g2d.draw(enemiesCollisionBox);
 	}
 	void update() {
 		y = y + (int) speed;

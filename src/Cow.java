@@ -60,6 +60,7 @@ public class Cow {
 		}
 		if (y < jumpRestriction) {
 			isFalling = true;
+			GamePanel.counterForSound++;
 		}
 		if (y > 250) {
 			isFalling = false;
