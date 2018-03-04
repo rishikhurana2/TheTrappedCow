@@ -41,9 +41,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 	long enemyTimer = 0;
 	int enemySpawnTimer = 5000;
 	int score = 0;
-	int fps = 1000/60;
+	int fps = 1000/75;
 	static int counterForSound = 0;
-	String tellIfYouCanMove = "You can move now to dodge blocks!";
+	String tellIfYouCanMove = "You can move now to dodge the rockets!";
 	public static BufferedImage cowImg;
 	public static BufferedImage backgroundImg;
 	public static BufferedImage scoreUpImg;
@@ -88,7 +88,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		g.setFont(tellFont);
 		g.drawString("Score: " + score, 650, 25);
 		g.setFont(smallFont1);
-		g.drawString("Press 'P' to go to the end screen", 580, 60);
 		cow.draw(g);
 		for (int i = 0; i < su.size(); i++) {
 			for (Blocks b: blocks) {
@@ -141,7 +140,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		i.drawString("This game is a scroller, and there is blocks coming in from the right. What you need to do is AVOID THOSE BLOCKS.", 25, 225);
 		i.drawString("You can, however, jump on the blocks (which will increase your score). Along the way, you will see gold coins, and if you", 25, 240);
 		i.drawString("get those coins, your score will increase. Your score is displayed on the top right. As you navigate through the cow's", 25, 255);
-		i.drawString("infinite run, there will be enemies that will spawn from the sky, and YOU MUST DODGE THEM, or game over.", 25,  270);
+		i.drawString("infinite run, there will be rockets that will come in from the sky, and YOU MUST DODGE THEM, or game over.", 25,  270);
 		i.drawString("Finally, you cannot jump while on the blocks", 25, 285);
 		i.setFont(tellFont);
 		i.drawString("Press 'esc' to go back to the home screen", 25, 470);
@@ -287,8 +286,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener{
 		if(e.getKeyCode() == KeyEvent.VK_P) {
 			if(currentState == MENU_STAGE) {
 				currentState = GAME_STAGE;
-			} else if (currentState == GAME_STAGE) {
-				currentState = END_STAGE;
 			}
 		}
 		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
