@@ -10,7 +10,6 @@ public class Blocks {
 	int width = 60;
 	int height = 60;
 	int blockSpeed = 5;
-	ArrayList <Blocks> blocks = new ArrayList<Blocks>();
 	Rectangle blocksBox;
 	Blocks(int y) {
 		this.y = y;
